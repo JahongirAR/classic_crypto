@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e2761">
+  <meta name="description" content="Klassik shifrlash algoritmlarini bosqichma-bosqich o'rganing: Caesar, Vigenère, Hill, DES, AES, RSA va boshqalar.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Kripto">
+  <title>Classical Cryptography Visualizer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="boot" role="status" aria-live="polite">
+    <div class="boot-card">
+      <div class="boot-spin"></div>
+      <div id="boot-text">Yuklanmoqda…</div>
+      <noscript>Bu sayt ishlashi uchun JavaScript yoqilgan bo'lishi kerak.</noscript>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="title">CLASSICAL CRYPTOGRAPHY VISUALIZER</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button onclick="goHome()">⌂ Bosh sahifa</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HOME PAGE (kartalar Python katalogidan avtomatik chiziladi) -->
+    <div id="page-home">
+      <div class="hero">
+        <h1>Classical Cryptography Visualizer</h1>
+        <p>Klassik shifrlash algoritmlarini bosqichma-bosqich animatsiya orqali o'rganing</p>
+      </div>
+      <div id="load-errors"></div>
+      <div class="grid-nav" id="cipher-nav"></div>
+      <div class="util-row" id="tool-nav"></div>
+    </div>
+
+    <!-- MODULE PAGE (barcha shifrlar uchun bitta umumiy sahifa) -->
+    <div id="page-module" class="hidden">
+      <div class="module-head">
+        <h2 id="m-title"></h2>
+        <p id="m-desc"></p>
+      </div>
+      <div class="module-body">
+        <div class="formula-row" id="m-formulas"></div>
+        <div class="map-row" id="m-map"></div>
+
+        <div class="mode-toggle">
+          <div id="mode-learn" class="active" onclick="setMode('learn')">O'rganish rejimi</div>
+          <div id="mode-practice" onclick="setMode('practice')">Amaliy rejim</div>
+        </div>
+
+        <div class="cols">
+          <div>
+            <div id="m-inputs"></div>
+            <div id="m-live"></div>
+            <div>
+              <button class="btn btn-primary" id="btn-enc" onclick="runCipher('enc')">Encrypt</button>
+              <button class="btn btn-primary" id="btn-dec" onclick="runCipher('dec')">Decrypt</button>
+              <button class="btn btn-outline" onclick="resetModule()">↻ Reset</button>
+            </div>
+            <div class="examples" id="m-examples"></div>
+            <div id="m-error"></div>
+            <div id="m-result"></div>
+            <div class="explainer-grid" id="m-explainer"></div>
+            <div class="weak-box" id="m-weak"></div>
+          </div>
+
+          <div>
+            <div class="stage" id="m-stage">
+              <div class="step-desc">Encrypt yoki Decrypt tugmasini bosing.</div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-label" id="m-progress-label">Step 0 / 0</div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="m-progress-fill"></div>
+              </div>
+            </div>
+            <div class="controls">
+              <button class="btn btn-outline btn-sm" onclick="stepPrev()">◀ Oldingi</button>
+              <button class="btn btn-primary btn-sm" onclick="stepPlay()">▶ Play</button>
+              <button class="btn btn-outline btn-sm" onclick="stepPause()">⏸ Pause</button>
+              <button class="btn btn-outline btn-sm" onclick="stepNext()">Keyingi ▶</button>
+              <div class="speed-wrap">
+                <span>Tezlik:</span>
+                <input type="range" min="1" max="3" value="2" id="speed-slider" oninput="setSpeed(this.value)">
+                <span id="speed-label">Normal</span>
+              </div>
+            </div>
+            <div id="predict-area"></div>
+            <div class="table-wrap">
+              <table class="steptable" id="m-table"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YORDAMCHI FUNKSIYALAR SAHIFALARI (tools/ papkasidan avtomatik yaratiladi) -->
+
+  </main>
+  <footer>Hisob-kitoblar Python'da, brauzeringizning ichida · bir marta ochgach internetsiz ham ishlaydi</footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+
+</html>

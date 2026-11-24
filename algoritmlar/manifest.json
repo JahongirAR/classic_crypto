@@ -1,0 +1,29 @@
+{
+ "version": "310baad54294",
+ "files": [
+  "algorithms/__init__.py",
+  "algorithms/_des_tables.py",
+  "algorithms/aes.py",
+  "algorithms/affine.py",
+  "algorithms/atbash.py",
+  "algorithms/caesar.py",
+  "algorithms/columnar.py",
+  "algorithms/des.py",
+  "algorithms/hill.py",
+  "algorithms/mono.py",
+  "algorithms/rail_fence.py",
+  "algorithms/rsa.py",
+  "algorithms/vigenere.py",
+  "algorithms/xor.py",
+  "api.py",
+  "core/__init__.py",
+  "core/helpers.py",
+  "core/registry.py",
+  "core/visual.py",
+  "tools/__init__.py",
+  "tools/calculator.py",
+  "tools/compare.py",
+  "tools/practice.py",
+  "tools/quiz.py"
+ ]
+}
