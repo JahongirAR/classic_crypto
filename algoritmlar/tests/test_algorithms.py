@@ -99,6 +99,12 @@ class Vectors(unittest.TestCase):
         self.assertEqual((out["data"]["x"], out["data"]["y"]), (6, 19))
         self.assertEqual(out["data"]["point_order"], 28)
         self.assertEqual(out["data"]["curve_order"], 28)
+        self.assertEqual(out["extra"]["type"], "ecc-plot")
+        self.assertEqual(len(out["extra"]["points"]), out["data"]["curve_order"] - 1)
+        self.assertEqual(out["extra"]["markers"], [
+            {"label": "P", "x": 0, "y": 1, "color": "cyan"},
+            {"label": "2P", "x": 6, "y": 19, "color": "gold"},
+        ])
 
         # Slide example: 3P + 7P = (12, 4), correcting its listed (12, 14).
         added = run("ecc", "dec", {
@@ -107,6 +113,8 @@ class Vectors(unittest.TestCase):
         })
         self.assertNotIn("error", added, added)
         self.assertEqual((added["data"]["x"], added["data"]["y"]), (12, 4))
+        self.assertEqual(len(added["extra"]["points"]), added["data"]["curve_order"] - 1)
+        self.assertEqual([marker["label"] for marker in added["extra"]["markers"]], ["P", "Q", "P + Q"])
 
     def test_ecc_inverse_and_parameter_validation(self):
         doubled = run("ecc", "dec", {

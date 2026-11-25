@@ -150,8 +150,63 @@ function renderVisual(v) {
     }
     case 'text': return `<div class="vtext">${esc(v.text)}</div>`;
     case 'panel': return `<div class="vpanel"><div class="vt">${esc(v.title)}</div>${v.blocks.map(renderBlock).join('')}</div>`;
+    case 'ecc-plot': return renderEccPlot(v);
   }
   return '';
+}
+
+function renderEccPlot(v) {
+  const p = Number(v.p), a = Number(v.a), b = Number(v.b);
+  if (!Number.isInteger(p) || p < 5 || p > 10000 ||
+      !Number.isInteger(a) || !Number.isInteger(b) || !Array.isArray(v.points)) return '';
+  const width = 720, height = 380, left = 54, right = 22, top = 24, bottom = 43;
+  const plotWidth = width - left - right, plotHeight = height - top - bottom;
+  const xPos = x => left + (x / (p - 1)) * plotWidth;
+  const yPos = y => top + ((p - 1 - y) / (p - 1)) * plotHeight;
+  const radius = p > 1500 ? 1 : p > 500 ? 1.4 : 2;
+  const dots = [];
+  v.points.forEach(point => {
+    if (!Array.isArray(point) || point.length !== 2) return;
+    const x = Number(point[0]), y = Number(point[1]);
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || x >= p || y < 0 || y >= p) return;
+    const px = xPos(x), py = yPos(y);
+    dots.push(`M${px - radius},${py}a${radius},${radius} 0 1 0 ${radius * 2},0a${radius},${radius} 0 1 0 ${-radius * 2},0`);
+  });
+  const ticks = [...new Set([0, Math.floor((p - 1) / 2), p - 1])];
+  const grid = ticks.map(tick => `
+    <line x1="${left}" y1="${yPos(tick)}" x2="${width - right}" y2="${yPos(tick)}" stroke="#334155" stroke-dasharray="3 5"/>
+    <line x1="${xPos(tick)}" y1="${top}" x2="${xPos(tick)}" y2="${height - bottom}" stroke="#334155" stroke-dasharray="3 5"/>
+    <text x="${left - 9}" y="${yPos(tick) + 4}" fill="#94a3b8" text-anchor="end" font-size="11">${tick}</text>
+    <text x="${xPos(tick)}" y="${height - bottom + 19}" fill="#94a3b8" text-anchor="middle" font-size="11">${tick}</text>`).join('');
+  const palette = { cyan: '#22d3ee', violet: '#c084fc', gold: '#fbbf24' };
+  const markers = (Array.isArray(v.markers) ? v.markers : []).map(marker => {
+    const x = Number(marker.x), y = Number(marker.y);
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || x >= p || y < 0 || y >= p) return '';
+    const color = palette[marker.color] || palette.gold;
+    const px = xPos(x), py = yPos(y);
+    return `<circle cx="${px}" cy="${py}" r="6" fill="${color}" stroke="#0f172a" stroke-width="2"><title>${esc(marker.label)} = (${x}, ${y})</title></circle>
+      <text x="${px + 9}" y="${py - 8}" fill="${color}" font-size="12" font-weight="700">${esc(marker.label)}</text>`;
+  }).join('');
+  const legend = (Array.isArray(v.markers) ? v.markers : []).map(marker => {
+    const color = palette[marker.color] || palette.gold;
+    return `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px;color:${color}"><i style="width:9px;height:9px;border-radius:50%;background:${color}"></i>${esc(marker.label)} (${Number(marker.x)}, ${Number(marker.y)})</span>`;
+  }).join('');
+  return `<div style="margin:12px 0;padding:12px;background:#0f172a;border:1px solid #334155;border-radius:8px;">
+    <div style="color:#e2e8f0;font-weight:700;margin-bottom:4px;">E(F<sub>${p}</sub>): y² ≡ x³ + ${a}x + ${b} (mod ${p})</div>
+    <div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">Faqat chekli maydondagi yechimlar chizilgan — uzluksiz haqiqiy sonli egri chiziq emas.</div>
+    <div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="F${p} ustidagi elliptik egri chiziqning diskret nuqtalari" style="display:block;width:100%;min-width:340px;height:auto;">
+      <rect x="${left}" y="${top}" width="${plotWidth}" height="${plotHeight}" fill="#111c30" rx="4"/>
+      ${grid}
+      <path d="${dots.join('')}" fill="#8296b2" opacity=".8"/>
+      ${markers}
+      <line x1="${left}" y1="${height - bottom}" x2="${width - right}" y2="${height - bottom}" stroke="#94a3b8"/>
+      <line x1="${left}" y1="${top}" x2="${left}" y2="${height - bottom}" stroke="#94a3b8"/>
+      <text x="${width / 2}" y="${height - 5}" fill="#cbd5e1" text-anchor="middle" font-size="12">x koordinatasi (mod ${p})</text>
+      <text x="14" y="${height / 2}" fill="#cbd5e1" text-anchor="middle" font-size="12" transform="rotate(-90 14 ${height / 2})">y koordinatasi (mod ${p})</text>
+    </svg></div>
+    <div style="font-size:12px;margin-top:8px;">${legend}</div>
+    <div style="font-size:11px;color:#94a3b8;margin-top:5px;">Jami affin nuqtalar: ${dots.length}</div>
+  </div>`;
 }
 
 /* ---------------- Shifr moduli (barcha algoritmlar uchun umumiy) ---------------- */

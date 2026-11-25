@@ -177,6 +177,28 @@ def _curve_panel(p, a, b, discriminant, group_size):
     )
 
 
+def _curve_plot(p, a, b, markers):
+    """Return all affine F_p points and a few labeled points for the browser plot."""
+    roots = {}
+    for y in range(p):
+        roots.setdefault(y * y % p, []).append(y)
+    points = []
+    for x in range(p):
+        rhs = (x * x * x + a * x + b) % p
+        points.extend([x, y] for y in roots.get(rhs, ()))
+    return {
+        "type": "ecc-plot",
+        "p": p,
+        "a": a,
+        "b": b,
+        "points": points,
+        "markers": [
+            {"label": label, "x": point[0], "y": point[1], "color": color}
+            for label, point, color in markers if point is not INFINITY
+        ],
+    }
+
+
 def run(mode, vals):
     if mode not in ("enc", "dec"):
         return error("Amal turi enc yoki dec bo'lishi kerak.")
@@ -229,6 +251,10 @@ def run(mode, vals):
         return {
             "steps": steps,
             "result": result_text,
+            "extra": _curve_plot(p, a, b, [
+                ("P", point, "cyan"),
+                (f"{scalar}P", result, "gold"),
+            ]),
             "data": data,
             "table_cols": ["Amal", "k", "Ikkilik", "Natija"],
         }
@@ -277,6 +303,11 @@ def run(mode, vals):
     return {
         "steps": steps,
         "result": f"P + Q = {_format_point(result)}",
+        "extra": _curve_plot(p, a, b, [
+            ("P", point, "cyan"),
+            ("Q", other, "violet"),
+            ("P + Q", result, "gold"),
+        ]),
         "data": {"point": _format_point(result), "x": result[0] if result else None,
                 "y": result[1] if result else None, "point_order": order, "curve_order": group_size},
         "table_cols": ["Amal", "P", "Q", "Natija"],
