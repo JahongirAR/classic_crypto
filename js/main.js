@@ -290,21 +290,22 @@ async function runCipher(mode) {
   const token = ++runToken;
   const out = await api(`/api/algo/${cur.id}/run`, { mode, vals: collectVals() });
   if (token !== runToken) return;                 // eskirgan javob
-  $('m-error').innerHTML = ''; $('m-result').innerHTML = '';
+  $('m-error').innerHTML = ''; $('m-result').innerHTML = ''; $('m-plot').innerHTML = '';
   if (out.error) {
     $('m-error').innerHTML = `<div class="err-box">${esc(out.error)}</div>`;
     steps = []; tableCols = []; renderTable(); renderStage(-1);
     return;
   }
   steps = out.steps; tableCols = out.table_cols || []; stepIdx = -1;
-  $('m-result').innerHTML = renderVisual(out.extra) + `<div class="result-box">Natija: ${esc(out.result)}</div>`;
+  $('m-plot').innerHTML = renderVisual(out.extra);
+  $('m-result').innerHTML = `<div class="result-box">Natija: ${esc(out.result)}</div>`;
   renderTable();
   stepNext();
 }
 function resetModule() {
   stepPause(); runToken++;
   steps = []; stepIdx = -1; tableCols = [];
-  $('m-error').innerHTML = ''; $('m-result').innerHTML = ''; $('predict-area').innerHTML = '';
+  $('m-error').innerHTML = ''; $('m-result').innerHTML = ''; $('m-plot').innerHTML = ''; $('predict-area').innerHTML = '';
   ['btn-enc', 'btn-dec'].forEach(i => $(i).classList.remove('btn-active-enc', 'btn-active-dec'));
   renderTable(); renderStage(-1);
 }
