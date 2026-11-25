@@ -90,12 +90,54 @@ class Vectors(unittest.TestCase):
         self.assertIn("error", run("elgamal", "enc", {**base, "pt": "AB"}))
         self.assertIn("error", run("elgamal", "enc", {**base, "pt": "\x00"}))
 
+    def test_ecc_scalar_multiplication_and_slide_vector(self):
+        out = run("ecc", "enc", {
+            "p": "23", "a": "1", "b": "1", "px": "0", "py": "1", "k": "2",
+            "qx": "6", "qy": "19",
+        })
+        self.assertNotIn("error", out, out)
+        self.assertEqual((out["data"]["x"], out["data"]["y"]), (6, 19))
+        self.assertEqual(out["data"]["point_order"], 28)
+        self.assertEqual(out["data"]["curve_order"], 28)
+
+        # Slide example: 3P + 7P = (12, 4), correcting its listed (12, 14).
+        added = run("ecc", "dec", {
+            "p": "23", "a": "1", "b": "1", "px": "3", "py": "13", "k": "1",
+            "qx": "11", "qy": "3",
+        })
+        self.assertNotIn("error", added, added)
+        self.assertEqual((added["data"]["x"], added["data"]["y"]), (12, 4))
+
+    def test_ecc_inverse_and_parameter_validation(self):
+        doubled = run("ecc", "dec", {
+            "p": "23", "a": "1", "b": "1", "px": "0", "py": "1", "k": "1",
+            "qx": "0", "qy": "1",
+        })
+        self.assertEqual((doubled["data"]["x"], doubled["data"]["y"]), (6, 19))
+        inverse = run("ecc", "dec", {
+            "p": "23", "a": "1", "b": "1", "px": "0", "py": "1", "k": "1",
+            "qx": "0", "qy": "22",
+        })
+        self.assertEqual(inverse["data"]["point"], "O (cheksizlik nuqtasi)")
+        self.assertIn("error", run("ecc", "enc", {
+            "p": "15", "a": "1", "b": "1", "px": "0", "py": "1", "k": "2",
+            "qx": "6", "qy": "19",
+        }))
+        self.assertIn("error", run("ecc", "enc", {
+            "p": "23", "a": "0", "b": "0", "px": "0", "py": "0", "k": "2",
+            "qx": "0", "qy": "0",
+        }))
+        self.assertIn("error", run("ecc", "enc", {
+            "p": "23", "a": "1", "b": "1", "px": "0", "py": "2", "k": "2",
+            "qx": "6", "qy": "19",
+        }))
+
 
 class Structure(unittest.TestCase):
     def test_every_algorithm(self):
         self.assertEqual(registry.LOAD_ERRORS, {})
         algos = registry.algorithms()
-        self.assertGreaterEqual(len(algos), 12)
+        self.assertGreaterEqual(len(algos), 15)
         ids = [a["meta"]["id"] for a in algos]
         self.assertEqual(len(ids), len(set(ids)), "algoritm id lari takrorlanmasin")
         for a in algos:
@@ -166,7 +208,7 @@ class Structure(unittest.TestCase):
         import json
         import api
         cat = json.loads(api.handle("GET", "/api/catalog"))
-        self.assertEqual(len(cat["algorithms"]), 14)
+        self.assertEqual(len(cat["algorithms"]), 15)
         self.assertNotIn("hash", [tool["id"] for tool in cat["tools"]])
         out = json.loads(api.handle("POST", "/api/algo/caesar/run", json.dumps({"mode": "enc", "vals": {"pt": "HELLO", "key": 3}})))
         self.assertEqual(out["result"], "KHOOR")

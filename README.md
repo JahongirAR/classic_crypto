@@ -34,8 +34,9 @@ python algoritmlar/_build_manifest.py                          # .py fayl qo'shg
 python -m unittest discover -s algoritmlar/tests -t algoritmlar
 ```
 
-Yangi algoritm: `algorithms/_template.py` → `mening_shifrim.py`, `META` va `run()` ni to'ldiring,
+Yangi algoritm: `algorithms/_template.py` → o'zbekcha CamelCase nomli fayl (masalan, `MeningShifrim.py`), `META` va `run()` ni to'ldiring,
 `_build_manifest.py` ni ishga tushiring, yuklang. Karta, o'quv sahifa, taqqoslash qatori, topshiriq va savollar o'zi paydo bo'ladi.
+Fayl nomi o'zgarsa ham, `META["id"]` qiymatini o'zgartirmang — u API va ilova uchun doimiy identifikator.
 Brauzerlar: Chrome/Edge/Firefox 114+/Safari 15+ (module worker kerak).
 
 ElGamal demo'sida `p` tub son, `g` esa generator bo'lishi kerak. `x` — maxfiy kalit;
@@ -45,6 +46,10 @@ beriladi. Ilovadagi kichik sonli namoyish haqiqiy maxfiy ma'lumotlar uchun mo'lj
 Xesh algoritmlar qatorida SHA-256, SHA-512, SHA-1, SHA-224, SHA-384 va MD5 tanlanadi.
 Digestni hisoblash yoki matn bilan berilgan digest mosligini tekshirish mumkin.
 MD5 va SHA-1 eskirgan va xavfsiz maqsadlar uchun tavsiya etilmaydi.
+
+ECC bo'limida kichik tub maydonlarda egri chiziq nuqtalarini qo'shish va Double-and-Add
+orqali kP hisoblanadi. Qadamlar, nuqta tartibi, egri chiziqdagi nuqtalar soni va Hasse chegarasi
+ko'rsatiladi. Bu faqat o'quv namoyishi; haqiqiy himoya uchun emas.
 
 ## API (ichki)
 

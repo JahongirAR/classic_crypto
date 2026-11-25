@@ -162,9 +162,11 @@ function openModule(id) {
   if (!cur) return;
   $('m-title').textContent = cur.name;
   $('m-desc').textContent = cur.desc;
+  $('btn-enc').textContent = cur.mode_enc_label || 'Encrypt';
+  $('btn-dec').textContent = cur.mode_dec_label || 'Decrypt';
   $('m-formulas').innerHTML =
-    `<div class="formula-box"><span>ENCRYPT FORMULA</span>${esc(cur.formula_enc)}</div>` +
-    `<div class="formula-box"><span>DECRYPT FORMULA</span>${esc(cur.formula_dec)}</div>`;
+    `<div class="formula-box"><span>${esc(cur.mode_enc_title || 'ENCRYPT FORMULA')}</span>${esc(cur.formula_enc)}</div>` +
+    `<div class="formula-box"><span>${esc(cur.mode_dec_title || 'DECRYPT FORMULA')}</span>${esc(cur.formula_dec)}</div>`;
   $('m-map').textContent = cur.map;
   $('m-weak').innerHTML = `<b>Zaiflik / Attack:</b> ${esc(cur.weak)}`;
   const ex = cur.explainer || {};
