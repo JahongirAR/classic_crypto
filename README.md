@@ -49,7 +49,9 @@ MD5 va SHA-1 eskirgan va xavfsiz maqsadlar uchun tavsiya etilmaydi.
 
 ECC bo'limida kichik tub maydonlarda egri chiziq nuqtalarini qo'shish va Double-and-Add
 orqali kP hisoblanadi. Qadamlar, nuqta tartibi, egri chiziqdagi nuqtalar soni va Hasse chegarasi
-ko'rsatiladi. Bu faqat o'quv namoyishi; haqiqiy himoya uchun emas.
+ko'rsatiladi. Grafikda kiritilgan a va b koeffitsiyentlari bilan haqiqiy sonlardagi uzluksiz egri
+chiziq, uning ostida esa F_p dagi alohida nuqtalar ko'rsatiladi. Bu faqat o'quv namoyishi; haqiqiy
+himoya uchun emas.
 
 ## API (ichki)
 

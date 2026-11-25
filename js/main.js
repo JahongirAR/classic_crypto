@@ -159,6 +159,47 @@ function renderEccPlot(v) {
   const p = Number(v.p), a = Number(v.a), b = Number(v.b);
   if (!Number.isInteger(p) || p < 5 || p > 10000 ||
       !Number.isInteger(a) || !Number.isInteger(b) || !Array.isArray(v.points)) return '';
+  const realWidth = 720, realHeight = 300, realLeft = 54, realRight = 22, realTop = 18, realBottom = 38;
+  const span = Math.max(4, 2 * Math.sqrt(Math.abs(a) + 1), 2 * Math.cbrt(Math.abs(b) + 1));
+  const sampleCount = 600;
+  const samples = [];
+  let yLimit = 1;
+  for (let i = 0; i <= sampleCount; i++) {
+    const x = -span + (2 * span * i) / sampleCount;
+    const rhs = x * x * x + a * x + b;
+    const y = rhs >= 0 ? Math.sqrt(rhs) : null;
+    samples.push({ x, y });
+    if (y !== null) yLimit = Math.max(yLimit, y);
+  }
+  yLimit *= 1.08;
+  const realPlotWidth = realWidth - realLeft - realRight;
+  const realPlotHeight = realHeight - realTop - realBottom;
+  const realX = x => realLeft + ((x + span) / (2 * span)) * realPlotWidth;
+  const realY = y => realTop + ((yLimit - y) / (2 * yLimit)) * realPlotHeight;
+  const branches = [1, -1].map(sign => {
+    let path = '', open = false;
+    samples.forEach(({ x, y }) => {
+      if (y === null) { open = false; return; }
+      path += `${open ? 'L' : 'M'}${realX(x)},${realY(sign * y)}`;
+      open = true;
+    });
+    return `<path d="${path}" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"${sign < 0 ? ' opacity=".72"' : ''}/>`;
+  }).join('');
+  const realGrid = [-span, 0, span].map(x => `
+    <line x1="${realX(x)}" y1="${realTop}" x2="${realX(x)}" y2="${realHeight - realBottom}" stroke="#334155" stroke-dasharray="3 5"/>
+    <text x="${realX(x)}" y="${realHeight - realBottom + 17}" fill="#94a3b8" text-anchor="middle" font-size="11">${Number(x.toPrecision(3))}</text>`).join('') +
+    [-yLimit, 0, yLimit].map(y => `
+    <line x1="${realLeft}" y1="${realY(y)}" x2="${realWidth - realRight}" y2="${realY(y)}" stroke="#334155" stroke-dasharray="3 5"/>
+    <text x="${realLeft - 8}" y="${realY(y) + 4}" fill="#94a3b8" text-anchor="end" font-size="11">${Number(y.toPrecision(3))}</text>`).join('');
+  const realCurve = `<div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${realWidth} ${realHeight}" role="img" aria-label="Haqiqiy sonlarda y kvadrat teng x kub plus ${a} x plus ${b} egri chizig'i" style="display:block;width:100%;min-width:340px;height:auto;">
+    <rect x="${realLeft}" y="${realTop}" width="${realPlotWidth}" height="${realPlotHeight}" fill="#111c30" rx="4"/>
+    ${realGrid}
+    <line x1="${realLeft}" y1="${realY(0)}" x2="${realWidth - realRight}" y2="${realY(0)}" stroke="#94a3b8"/>
+    <line x1="${realX(0)}" y1="${realTop}" x2="${realX(0)}" y2="${realHeight - realBottom}" stroke="#94a3b8"/>
+    ${branches}
+    <text x="${realWidth / 2}" y="${realHeight - 3}" fill="#cbd5e1" text-anchor="middle" font-size="12">x</text>
+    <text x="14" y="${realHeight / 2}" fill="#cbd5e1" text-anchor="middle" font-size="12" transform="rotate(-90 14 ${realHeight / 2})">y</text>
+  </svg></div>`;
   const width = 720, height = 380, left = 54, right = 22, top = 24, bottom = 43;
   const plotWidth = width - left - right, plotHeight = height - top - bottom;
   const xPos = x => left + (x / (p - 1)) * plotWidth;
@@ -192,8 +233,11 @@ function renderEccPlot(v) {
     return `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px;color:${color}"><i style="width:9px;height:9px;border-radius:50%;background:${color}"></i>${esc(marker.label)} (${Number(marker.x)}, ${Number(marker.y)})</span>`;
   }).join('');
   return `<div style="margin:12px 0;padding:12px;background:#0f172a;border:1px solid #334155;border-radius:8px;">
-    <div style="color:#e2e8f0;font-weight:700;margin-bottom:4px;">E(F<sub>${p}</sub>): y² ≡ x³ + ${a}x + ${b} (mod ${p})</div>
-    <div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">Faqat chekli maydondagi yechimlar chizilgan — uzluksiz haqiqiy sonli egri chiziq emas.</div>
+    <div style="color:#e2e8f0;font-weight:700;margin-bottom:4px;">Haqiqiy sonlardagi egri chiziq: y² = x³ + ${a}x + ${b}</div>
+    <div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">Bu uzluksiz ko'rinish a va b kirishlaridan chiziladi; ECC amallari esa pastdagi F<sub>${p}</sub> diskret nuqtalarida bajariladi.</div>
+    ${realCurve}
+    <div style="color:#e2e8f0;font-weight:700;margin:14px 0 4px;">E(F<sub>${p}</sub>): y² ≡ x³ + ${a}x + ${b} (mod ${p})</div>
+    <div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">Modul bo'yicha yechimlar alohida nuqtalar bo'lib, chiziq bilan ulanmaydi.</div>
     <div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="F${p} ustidagi elliptik egri chiziqning diskret nuqtalari" style="display:block;width:100%;min-width:340px;height:auto;">
       <rect x="${left}" y="${top}" width="${plotWidth}" height="${plotHeight}" fill="#111c30" rx="4"/>
       ${grid}
