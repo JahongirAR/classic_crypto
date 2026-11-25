@@ -1,5 +1,5 @@
 {
- "version": "7e3cc7b5a79c",
+ "version": "34113acdc6e4",
  "files": [
   "algorithms/__init__.py",
   "algorithms/_des_tables.py",
@@ -10,6 +10,7 @@
   "algorithms/columnar.py",
   "algorithms/des.py",
   "algorithms/elgamal.py",
+  "algorithms/hash.py",
   "algorithms/hill.py",
   "algorithms/mono.py",
   "algorithms/rail_fence.py",
@@ -24,7 +25,6 @@
   "tools/__init__.py",
   "tools/calculator.py",
   "tools/compare.py",
-  "tools/hash_tool.py",
   "tools/practice.py",
   "tools/quiz.py"
  ]
