@@ -1,5 +1,5 @@
 {
- "version": "e35c089e38b6",
+ "version": "7e3cc7b5a79c",
  "files": [
   "algorithms/__init__.py",
   "algorithms/_des_tables.py",
@@ -24,6 +24,7 @@
   "tools/__init__.py",
   "tools/calculator.py",
   "tools/compare.py",
+  "tools/hash_tool.py",
   "tools/practice.py",
   "tools/quiz.py"
  ]

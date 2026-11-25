@@ -42,6 +42,9 @@ ElGamal demo'sida `p` tub son, `g` esa generator bo'lishi kerak. `x` — maxfiy 
 shifrlashda har bir matn belgisi uchun alohida `k` kiriting. Shifrmatn `C₁:C₂; C₁:C₂` ko'rinishida
 beriladi. Ilovadagi kichik sonli namoyish haqiqiy maxfiy ma'lumotlar uchun mo'ljallanmagan.
 
+Xesh vositasida SHA-256, SHA-512, SHA-1, SHA-224, SHA-384 va MD5 tanlash mumkin.
+MD5 va SHA-1 eskirgan va xavfsiz maqsadlar uchun tavsiya etilmaydi.
+
 ## API (ichki)
 
 `algoritmlar/api.py` → `handle(method, path, body_json)`: `GET /api/catalog` · `POST /api/algo/<id>/run|live|action` · `POST /api/tool/<id>`

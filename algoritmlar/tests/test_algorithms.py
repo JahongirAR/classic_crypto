@@ -132,11 +132,49 @@ class Structure(unittest.TestCase):
         t = calc.handle("run", {"section": "text", "vals": {"value": "Salom", "dir": "text2base", "base": "16", "sep": "space"}})["blocks"][0]
         self.assertEqual(t["value"], "53 61 6C 6F 6D")
 
+    def test_hash_tool_known_vectors(self):
+        tool = registry.get_tool("hash")["module"]
+        expected = {
+            "md5": "900150983cd24fb0d6963f7d28e17f72",
+            "sha1": "a9993e364706816aba3e25717850c26c9cd0d89d",
+            "sha224": "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
+            "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+            "sha384": "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7",
+            "sha512": "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f",
+        }
+        for algorithm, digest in expected.items():
+            out = tool.handle("run", {
+                "section": "main",
+                "vals": {"algorithm": algorithm, "text": "abc"},
+            })
+            self.assertEqual(out["blocks"][0]["value"], digest, algorithm)
+
+    def test_hash_tool_empty_unicode_and_validation(self):
+        tool = registry.get_tool("hash")["module"]
+        empty = tool.handle("run", {
+            "section": "main",
+            "vals": {"algorithm": "sha256", "text": ""},
+        })
+        self.assertEqual(
+            empty["blocks"][0]["value"],
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        )
+        unicode_out = tool.handle("run", {
+            "section": "main",
+            "vals": {"algorithm": "sha256", "text": "o'zbek"},
+        })
+        self.assertEqual(unicode_out["blocks"][1]["items"][2]["value"], "6 bayt (48 bit)")
+        self.assertIn("blocks", tool.handle("run", {
+            "section": "main",
+            "vals": {"algorithm": "sha3_256", "text": "abc"},
+        }))
+
     def test_api_handle(self):
         import json
         import api
         cat = json.loads(api.handle("GET", "/api/catalog"))
         self.assertEqual(len(cat["algorithms"]), 13)
+        self.assertIn("hash", [tool["id"] for tool in cat["tools"]])
         out = json.loads(api.handle("POST", "/api/algo/caesar/run", json.dumps({"mode": "enc", "vals": {"pt": "HELLO", "key": 3}})))
         self.assertEqual(out["result"], "KHOOR")
         for bad in ("[1]", "{xato", '{"mode":"enc","vals":[1]}'):
