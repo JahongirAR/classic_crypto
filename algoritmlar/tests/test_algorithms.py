@@ -72,6 +72,24 @@ class Vectors(unittest.TestCase):
             dec = run("rsa", "dec", {"primes": primes, "e": e, "pt": enc["data"]["cipher"]})
             self.assertEqual(dec["data"]["text"], text)
 
+    def test_elgamal(self):
+        vals = {"p": "467", "g": "2", "x": "127", "ks": "53, 89, 101, 151, 177", "pt": "SALOM"}
+        enc = run("elgamal", "enc", vals)
+        self.assertNotIn("error", enc, enc)
+        self.assertEqual(len(enc["data"]["cipher"].split(";")), len(vals["pt"]))
+        dec = run("elgamal", "dec", {**vals, "pt": enc["data"]["cipher"]})
+        self.assertNotIn("error", dec, dec)
+        self.assertEqual(dec["data"]["text"], vals["pt"])
+
+    def test_elgamal_validates_parameters_and_ciphertext(self):
+        base = {"p": "467", "g": "2", "x": "127", "ks": "53", "pt": "A"}
+        self.assertIn("error", run("elgamal", "enc", {**base, "p": "15"}))
+        self.assertIn("error", run("elgamal", "enc", {**base, "g": "4"}))
+        self.assertIn("error", run("elgamal", "enc", {**base, "ks": "467"}))
+        self.assertIn("error", run("elgamal", "dec", {**base, "pt": "1,2"}))
+        self.assertIn("error", run("elgamal", "enc", {**base, "pt": "AB"}))
+        self.assertIn("error", run("elgamal", "enc", {**base, "pt": "\x00"}))
+
 
 class Structure(unittest.TestCase):
     def test_every_algorithm(self):
@@ -118,7 +136,7 @@ class Structure(unittest.TestCase):
         import json
         import api
         cat = json.loads(api.handle("GET", "/api/catalog"))
-        self.assertEqual(len(cat["algorithms"]), 12)
+        self.assertEqual(len(cat["algorithms"]), 13)
         out = json.loads(api.handle("POST", "/api/algo/caesar/run", json.dumps({"mode": "enc", "vals": {"pt": "HELLO", "key": 3}})))
         self.assertEqual(out["result"], "KHOOR")
         for bad in ("[1]", "{xato", '{"mode":"enc","vals":[1]}'):

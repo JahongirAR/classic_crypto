@@ -38,6 +38,10 @@ Yangi algoritm: `algorithms/_template.py` → `mening_shifrim.py`, `META` va `ru
 `_build_manifest.py` ni ishga tushiring, yuklang. Karta, o'quv sahifa, taqqoslash qatori, topshiriq va savollar o'zi paydo bo'ladi.
 Brauzerlar: Chrome/Edge/Firefox 114+/Safari 15+ (module worker kerak).
 
+ElGamal demo'sida `p` tub son, `g` esa generator bo'lishi kerak. `x` — maxfiy kalit;
+shifrlashda har bir matn belgisi uchun alohida `k` kiriting. Shifrmatn `C₁:C₂; C₁:C₂` ko'rinishida
+beriladi. Ilovadagi kichik sonli namoyish haqiqiy maxfiy ma'lumotlar uchun mo'ljallanmagan.
+
 ## API (ichki)
 
 `algoritmlar/api.py` → `handle(method, path, body_json)`: `GET /api/catalog` · `POST /api/algo/<id>/run|live|action` · `POST /api/tool/<id>`

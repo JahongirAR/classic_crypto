@@ -1,5 +1,5 @@
 {
- "version": "310baad54294",
+ "version": "e35c089e38b6",
  "files": [
   "algorithms/__init__.py",
   "algorithms/_des_tables.py",
@@ -9,6 +9,7 @@
   "algorithms/caesar.py",
   "algorithms/columnar.py",
   "algorithms/des.py",
+  "algorithms/elgamal.py",
   "algorithms/hill.py",
   "algorithms/mono.py",
   "algorithms/rail_fence.py",
