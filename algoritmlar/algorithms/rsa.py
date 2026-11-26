@@ -99,7 +99,7 @@ def _to_int(t, name):
     return int(t)
 
 
-def generate_keys(primes_str, e_str):
+def _parse_primes(primes_str):
     toks = _tokens(primes_str)
     if len(toks) < 2:
         raise ValueError("Kamida 2 ta tub son kiritilishi kerak (masalan: 61, 53)")
@@ -109,6 +109,11 @@ def generate_keys(primes_str, e_str):
             raise ValueError(f"{i + 1}-son ({p}) tub son emas")
     if len(set(ps)) != len(ps):
         raise ValueError("Tub sonlar bir-biridan farqli bo'lishi kerak")
+    return ps
+
+
+def generate_keys(primes_str, e_str):
+    ps = _parse_primes(primes_str)
     n = 1
     phi = 1
     for p in ps:
@@ -162,9 +167,7 @@ def live(vals):
 
 def action_suggest_e(vals):
     try:
-        ps = [_to_int(t, "tub son") for t in _tokens(vals.get("primes"))]
-        if len(ps) < 2:
-            raise ValueError("Avval kamida 2 ta tub son kiriting.")
+        ps = _parse_primes(vals.get("primes"))
         phi = 1
         for p in ps:
             phi *= p - 1
@@ -187,6 +190,8 @@ def _pow_table(rows):
 
 
 def run(mode, vals):
+    if mode not in ("enc", "dec"):
+        return error("Amal turi enc yoki dec bo'lishi kerak.")
     try:
         k = generate_keys(vals.get("primes"), vals.get("e"))
     except ValueError as e:

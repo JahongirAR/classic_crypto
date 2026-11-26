@@ -72,6 +72,20 @@ class Vectors(unittest.TestCase):
             dec = run("rsa", "dec", {"primes": primes, "e": e, "pt": enc["data"]["cipher"]})
             self.assertEqual(dec["data"]["text"], text)
 
+    def test_rsa_rejects_invalid_mode_and_invalid_suggestion_inputs(self):
+        vals = {"primes": "61, 53", "e": "17", "pt": "SALOM"}
+        self.assertIn("error", run("rsa", "other", vals))
+
+        suggest_e = registry.get_algorithm("rsa")["module"].action_suggest_e
+        for primes in ("61", "15, 53", "61, 61", "abc, 53"):
+            with self.subTest(primes=primes):
+                self.assertIn("error", suggest_e({"primes": primes}))
+        suggested = suggest_e({"primes": "61, 53"})
+        self.assertNotIn("error", suggested)
+        rsa_module = registry.get_algorithm("rsa")["module"]
+        keys = rsa_module.generate_keys("61, 53", suggested["fill"]["e"])
+        self.assertEqual(keys["e"], int(suggested["fill"]["e"]))
+
     def test_elgamal(self):
         vals = {"p": "467", "g": "2", "x": "127", "ks": "53, 89, 101, 151, 177", "pt": "SALOM"}
         enc = run("elgamal", "enc", vals)
